@@ -44,3 +44,16 @@ class GitAssistant(object):
         iso_array[0] = iso_array[0][-2:]
         to_return = iso_array[1] + '-' +  iso_array[2] + '-' + iso_array[0]
         return to_return + FORMAT_STRING.format(str_sec)
+
+    def calculate_start_date(self, year):
+        beginning = datetime.datetime(year, 1, 1)
+        while beginning.weekday() != 6:
+            beginning -= datetime.timedelta(days=1)
+        return self.calculate_grid_dimensions(beginning, year)
+
+    def calculate_grid_dimensions(self, beginning, year):
+        delta = datetime.datetime(year, 12, 31) - beginning
+        cols = int(delta.days / 7)
+        last = delta.days % 7 + 1
+        return (cols, last, beginning)
+x = GitAssistant()
