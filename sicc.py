@@ -47,8 +47,11 @@ class GitAssistant(object):
 
     def calculate_start_date(self, year):
         beginning = datetime.datetime(year, 1, 1)
+        if beginning.weekday() == 6:
+            beginning -= datetime.timedelta(weeks=1)
         while beginning.weekday() != 6:
             beginning -= datetime.timedelta(days=1)
+        print(beginning)
         return self.calculate_grid_dimensions(beginning, year)
 
     def calculate_grid_dimensions(self, beginning, year):
@@ -56,4 +59,3 @@ class GitAssistant(object):
         cols = int(delta.days / 7)
         last = delta.days % 7 + 1
         return (cols, last, beginning)
-x = GitAssistant()
