@@ -42,9 +42,9 @@ class SiccWindow(object):
     def populate_calendar(self, cols, last, beginning):
         for child in self.grid.get_children():
             self.grid.remove(child)
-        for i in range(cols):
+        for i in range(cols + 1):
             for j in range(7):
-                if i == cols - 1 and j >= last:
+                if i == cols and j >= last:
                     continue
                 button = Gtk.Button()
                 button.connect('clicked', self.signal_button_press)
@@ -76,9 +76,9 @@ class SiccWindow(object):
 
     def signal_export(self, _):
         mask = []
-        for i in range(self.params[0]):
+        for i in range(self.params[0] + 1):
             for j in range(7):
-                if i == self.params[0] - 1 and j >= self.params[1]:
+                if i == self.params[0] and j >= self.params[1]:
                     break
                 button = self.grid.get_child_at(i, j)
                 curr = button.get_style_context().get_background_color(Gtk.StateFlags.NORMAL)
@@ -91,7 +91,6 @@ class SiccWindow(object):
                     color = COLOR_CYCLE[counter]
                     rgb.parse(color)
                 mask.append(counter)
-        print(mask)
         startday = self.params[2].toordinal()
         self.assistant.generate_repo(startday, mask)
 

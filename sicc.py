@@ -15,13 +15,14 @@ class GitAssistant(object):
         new_file = os.path.join(repo_dir, 'sicc')
 
         r = git.Repo.init(repo_dir)
-
-        f = open(new_file, 'wb')
+        hashes = []
+        dates = []
+        f = open(new_file, 'w')
         date = startday
         for i in range(len(mask)):
             for j in range(mask[i]):
                 date_string = self.get_date_string(date, j)
-                print(date_string)
+                f.write(date_string)
                 r.index.add([new_file])
                 r.index.commit("commit{0}.{1}".format(str(i), str(j)))
                 hexsha = r.head.commit.hexsha
@@ -39,7 +40,7 @@ class GitAssistant(object):
         str_sec = sec
         if len(sec) != 2:
             str_sec = '0' + sec
-        temp = datetime.date.fromordinal(date)
+        temp = datetime.date.fromordinal(date + 1)
         iso_array = temp.isoformat().split('-')
         iso_array[0] = iso_array[0][-2:]
         to_return = iso_array[1] + '-' +  iso_array[2] + '-' + iso_array[0]
