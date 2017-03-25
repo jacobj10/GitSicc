@@ -1,5 +1,4 @@
 import os
-
 import gi
 gi.require_version('Gtk', '3.0')
 
@@ -17,6 +16,11 @@ COLOR_CYCLE = [
 
 class SiccWindow(object):
     def __init__(self, *args, **kwargs):
+        self.color_to_counter = {}
+
+        for color in COLOR_CYCLE:
+            self.color_to_counter[color] = 0
+
         self.assistant = GitAssistant()
         self.builder = Gtk.Builder()
         self.builder.add_from_file(gtk_builder_file)
@@ -52,6 +56,8 @@ class SiccWindow(object):
                 rgb.parse(COLOR_CYCLE[0])
                 button.override_background_color(Gtk.StateFlags.NORMAL, rgb)
                 self.grid.attach(button, i, j, 1, 1)
+
+        self.color_to_counter['#ffffff'] = 7 * (cols + 1) - 7 + last
         self.grid.show_all()
 
     def signal_button_press(self, button):
@@ -66,6 +72,10 @@ class SiccWindow(object):
             rgb.parse(color)
         rgb.parse(COLOR_CYCLE[(counter + 1) % len(COLOR_CYCLE)])
         button.override_background_color(Gtk.StateFlags.NORMAL, rgb)
+        self.color_to_counter[COLOR_CYCLE[counter % len(COLOR_CYCLE)]] -= 1
+        self.color_to_counter[COLOR_CYCLE[(counter + 1) % len(COLOR_CYCLE)]] += 1
+
+        self.calculate_max(counter)
 
     def signal_entry_changed(self, text):
         text = text.get_text()
@@ -75,12 +85,21 @@ class SiccWindow(object):
             self.populate_calendar(self.params[0], self.params[1], self.params[2])
 
     def signal_export(self, _):
+        mask = self.get_mask()
+        startday = self.params[2].toordinal()
+        self.assistant.generate_repo(startday, mask)
+
+    def calculate_max(self, counter):
+        print(self.color_to_counter)
+
+    def get_mask(self):
         mask = []
         for i in range(self.params[0] + 1):
             for j in range(7):
                 if i == self.params[0] and j >= self.params[1]:
                     break
                 button = self.grid.get_child_at(i, j)
+
                 curr = button.get_style_context().get_background_color(Gtk.StateFlags.NORMAL)
                 counter = 0
                 color = COLOR_CYCLE[counter]
@@ -91,9 +110,7 @@ class SiccWindow(object):
                     color = COLOR_CYCLE[counter]
                     rgb.parse(color)
                 mask.append(counter)
-        startday = self.params[2].toordinal()
-        self.assistant.generate_repo(startday, mask)
-
+        return mask
 if __name__ == '__main__':
     x = SiccWindow()
     Gtk.main()

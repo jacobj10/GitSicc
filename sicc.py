@@ -6,6 +6,7 @@ import git
 
 FORMAT_STRING = " 01:01:{0}"
 
+
 class GitAssistant(object):
     def __init__(self):
         pass
@@ -34,6 +35,8 @@ class GitAssistant(object):
                  fi""".format(hexsha, date_string)
                 r.git.filter_branch('-f', '--env-filter', bash_string)
             date += 1
+        username = r.git.config('user.name')
+        r.create_remote('origin', "https://github.com/{0}/GitSicco.git".format(username))
 
     def get_date_string(self, date, int_sec):
         sec = str(int_sec)
