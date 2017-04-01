@@ -1,5 +1,6 @@
 import os
 import gi
+import math
 gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk, GObject, Gdk
@@ -9,9 +10,8 @@ gtk_builder_file = os.path.splitext(__file__)[0] + '.ui'
 
 COLOR_CYCLE = [
                 ('#ffffff'), ('#d6e685'),
-                ('#44a340'), ('#28752d'),
-                ('#1e6823'), ('#365e2f'),
-                ('#144e12')
+                ('#8cc665'), ('#44a340'),
+                ('#1e6823')
             ]
 
 class SiccWindow(object):
@@ -57,7 +57,6 @@ class SiccWindow(object):
                 button.override_background_color(Gtk.StateFlags.NORMAL, rgb)
                 self.grid.attach(button, i, j, 1, 1)
 
-        self.color_to_counter['#ffffff'] = 7 * (cols + 1) - 7 + last
         self.grid.show_all()
 
     def signal_button_press(self, button):
@@ -72,10 +71,10 @@ class SiccWindow(object):
             rgb.parse(color)
         rgb.parse(COLOR_CYCLE[(counter + 1) % len(COLOR_CYCLE)])
         button.override_background_color(Gtk.StateFlags.NORMAL, rgb)
-        self.color_to_counter[COLOR_CYCLE[counter % len(COLOR_CYCLE)]] -= 1
-        self.color_to_counter[COLOR_CYCLE[(counter + 1) % len(COLOR_CYCLE)]] += 1
-
-        self.calculate_max(counter)
+        if counter % len(COLOR_CYCLE) != 0:
+            self.color_to_counter[COLOR_CYCLE[counter % len(COLOR_CYCLE)]] -= 1
+        if (counter + 1) % len(COLOR_CYCLE) != 0:       
+            self.color_to_counter[COLOR_CYCLE[(counter + 1) % len(COLOR_CYCLE)]] += 1
 
     def signal_entry_changed(self, text):
         text = text.get_text()
@@ -85,12 +84,20 @@ class SiccWindow(object):
             self.populate_calendar(self.params[0], self.params[1], self.params[2])
 
     def signal_export(self, _):
+        color_max = 0
+        counter = len(COLOR_CYCLE) - 1
+        while counter > 0:
+            if self.color_to_counter[COLOR_CYCLE[counter]] != 0:
+                color_max = counter
+                counter = -1
+            counter -= 1
         mask = self.get_mask()
+        for color in mask:
+            if color != 0 :
+                if color != math.ceil(int(color * 1.0 / color_max * 100) / 25):
+                    
         startday = self.params[2].toordinal()
         self.assistant.generate_repo(startday, mask)
-
-    def calculate_max(self, counter):
-        print(self.color_to_counter)
 
     def get_mask(self):
         mask = []
