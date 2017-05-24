@@ -95,7 +95,8 @@ class SiccWindow(object):
         for color in mask:
             if color != 0 :
                 if color != math.ceil(int(color * 1.0 / color_max * 100) / 25):
-                    print("Not a possible color scheme")
+                    print("Not a possible color scheme, still parsing...")
+                    break
         startday = self.params[2].toordinal()
         self.assistant.generate_repo(startday, mask)
 

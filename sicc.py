@@ -5,7 +5,16 @@ import datetime
 import git
 
 FORMAT_STRING = " 01:01:{0}"
+INIT_ACTIONS = {
+                'open': open,
+                'mkdir': os.mkdir,
+            }
 
+COMMANDS = [
+                "for {0} in range({1}, {2}):",
+                "while {0} {1} {2}:,
+                "if {0}"
+            ]
 
 class GitAssistant(object):
     def __init__(self):
