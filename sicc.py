@@ -12,7 +12,7 @@ INIT_ACTIONS = {
 
 COMMANDS = [
                 "for {0} in range({1}, {2}):",
-                "while {0} {1} {2}:,
+                "while {0} {1} {2}:",
                 "if {0}"
             ]
 
